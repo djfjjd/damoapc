@@ -1,69 +1,19 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Brand, Icon } from "@/components/ui";
+import { tools } from "@/lib/tools";
+
+const steps = [["01", "Connect", "채널과 스토어, 파일 저장소를 한 번만 연결하세요."], ["02", "Create", "FlowMoa AI가 목적에 맞는 콘텐츠와 데이터를 만듭니다."], ["03", "Automate", "검토 후 게시·등록·정리까지 하나의 흐름으로 끝냅니다."]];
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  return <main className="landing-shell">
+    <header className="landing-nav wrap"><Link href="/" aria-label="FlowMoa 홈"><Brand /></Link><nav className="nav-links" aria-label="주요 메뉴"><a href="#solutions">Solutions</a><a href="#workflow">How it works</a><a href="#pricing">Pricing</a></nav><div className="nav-actions"><button className="language-pill">KO <Icon name="chevron" size={13} /></button><Link className="text-button" href="/dashboard">로그인</Link><Link className="primary-button small" href="/dashboard">무료로 시작하기 <Icon name="arrow" size={15} /></Link></div></header>
+    <section className="hero wrap"><div className="hero-copy"><div className="eyebrow"><span className="pulse-dot" /> One flow. Infinite possibilities.</div><h1>아이디어에서 실행까지,<br /><span>AI 자동화 하나로.</span></h1><p>콘텐츠 제작부터 커머스 운영, 문서 정리까지.<br />흩어진 반복 업무를 FlowMoa 하나로 연결하세요.</p><div className="hero-actions"><Link className="primary-button" href="/dashboard">무료로 시작하기 <Icon name="arrow" /></Link><a className="secondary-button" href="#solutions"><Icon name="play" size={17} /> 2분 데모 보기</a></div><div className="trust-line"><span className="avatar-stack"><i>J</i><i>M</i><i>S</i><i>+</i></span><span><b>빠르게 시작하세요</b><small>카드 등록 없이 7일 무료</small></span></div></div>
+      <div className="hero-visual" aria-label="FlowMoa 자동화 흐름 미리보기"><div className="glow-orb" /><div className="flow-card main-flow"><div className="flow-head"><span><Icon name="sparkles" /> New automation</span><span className="status-live">● Live</span></div><div className="flow-title"><div className="mini-icon violet"><Icon name="youtube" /></div><div><small>INPUT</small><b>새 영상이 업로드되면</b></div><Icon name="more" /></div><div className="connector"><span /></div><div className="flow-title"><div className="mini-icon mint"><Icon name="wand" /></div><div><small>FLOWMOA AI</small><b>핵심 구간 3개 추출</b></div><span className="ai-chip">AI</span></div><div className="connector"><span /></div><div className="flow-title"><div className="mini-icon coral"><Icon name="send" /></div><div><small>ACTION</small><b>Shorts · Reels 자동 발행</b></div><Icon name="check" /></div></div><div className="float-card float-top"><span className="success-icon"><Icon name="check" /></span><div><b>자동화 완료</b><small>3개 채널에 게시했어요</small></div></div><div className="float-card float-bottom"><span className="spark-icon"><Icon name="sparkles" /></span><div><b>이번 주 절약한 시간</b><strong>12h 40m</strong></div></div></div>
+    </section>
+    <section className="logo-strip wrap"><p>CREATORS & TEAMS BUILDING WITH FLOWMOA</p><div><span>◉ orbit</span><span>Northstar</span><span>MONO</span><span>vertex</span><span>Cloudline</span></div></section>
+    <section className="solutions section wrap" id="solutions"><div className="section-heading"><span>ONE WORKSPACE</span><h2>반복 업무는 줄이고,<br />성장에 집중하세요.</h2><p>5가지 AI 워크플로우로 매일의 운영을 더 빠르고 정확하게.</p></div><div className="solution-grid">{tools.map((tool, index) => <Link href={`/dashboard/${tool.slug}`} className={`solution-card card-${index + 1}`} key={tool.slug}><div className={`feature-icon ${tool.tone}`}><Icon name={tool.icon} /></div><div className="number">0{index + 1}</div><h3>{tool.name}</h3><p>{tool.description}</p><span className="learn">Explore workflow <Icon name="arrow" size={15} /></span><div className="card-visual"><Icon name={tool.icon} size={38} /><span /><span /></div></Link>)}</div></section>
+    <section className="workflow section" id="workflow"><div className="wrap"><div className="section-heading light"><span>SIMPLE BY DESIGN</span><h2>복잡한 자동화도<br />세 단계면 충분해요.</h2></div><div className="steps">{steps.map(([n,title,body]) => <article key={n}><span>{n}</span><h3>{title}</h3><p>{body}</p></article>)}</div><Link className="primary-button pale" href="/dashboard">첫 워크플로우 만들기 <Icon name="arrow" /></Link></div></section>
+    <section className="cta wrap" id="pricing"><div><span>START TODAY</span><h2>일은 더 가볍게,<br />가능성은 더 크게.</h2><p>지금 FlowMoa에서 첫 자동화를 시작해 보세요.</p></div><Link className="primary-button white" href="/dashboard">무료로 시작하기 <Icon name="arrow" /></Link></section>
+    <footer className="footer wrap"><Brand /><p>© 2026 FlowMoa. Work flows better.</p><div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div></footer>
+  </main>;
 }

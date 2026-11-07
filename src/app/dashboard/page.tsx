@@ -1,0 +1,11 @@
+import Link from "next/link";
+import { Icon } from "@/components/ui";
+import { recentJobs, tools } from "@/lib/tools";
+
+export default function Dashboard() {
+  return <><section className="dash-heading"><div><p>2026년 11월 7일 토요일</p><h1>좋은 아침이에요, FlowMoa 팀 👋</h1><span>오늘도 반복 업무는 FlowMoa에게 맡겨주세요.</span></div><Link href="/dashboard/shortform" className="primary-button"><Icon name="plus" /> 새로 만들기</Link></section>
+    <section className="metric-grid"><article><div><span>이번 달 생성</span><b>128</b><small><em>+18%</em> 지난달 대비</small></div><i className="metric-icon purple"><Icon name="sparkles" /></i></article><article><div><span>절약한 시간</span><b>42.5h</b><small><em>+6.2h</em> 지난달 대비</small></div><i className="metric-icon mint"><Icon name="clock" /></i></article><article><div><span>활성 자동화</span><b>8</b><small>5개 정상 실행 중</small></div><i className="metric-icon blue"><Icon name="trend" /></i></article><article className="credit-metric"><div><span>남은 크레딧</span><b>680</b><small>다음 충전 12월 1일</small></div><div className="ring">68<small>%</small></div></article></section>
+    <section className="dash-section"><div className="dash-section-head"><div><h2>무엇을 자동화할까요?</h2><p>원하는 도구를 선택해 바로 시작해 보세요.</p></div></div><div className="tool-grid">{tools.map(tool => <Link href={`/dashboard/${tool.slug}`} key={tool.slug} className="tool-card"><i className={`feature-icon ${tool.tone}`}><Icon name={tool.icon} /></i><div><h3>{tool.shortName}</h3><p>{tool.description}</p></div><span><Icon name="arrow" /></span></Link>)}</div></section>
+    <section className="dash-section recent"><div className="dash-section-head"><div><h2>최근 작업</h2><p>최근 생성하거나 편집한 작업이에요.</p></div><button>전체 보기 <Icon name="arrow" size={15} /></button></div><div className="job-table"><div className="table-head"><span>작업명</span><span>유형</span><span>상태</span><span>업데이트</span><span /></div>{recentJobs.map(job => <div className="table-row" key={job.title}><span><i className={`job-thumb ${job.tone}`}><Icon name="file" /></i><b>{job.title}</b></span><span>{job.type}</span><span><em className={job.status === "생성 중" ? "running" : job.status === "초안" ? "draft" : "done"}>{job.status}</em></span><span>{job.time}</span><button><Icon name="more" /></button></div>)}</div></section>
+  </>;
+}
