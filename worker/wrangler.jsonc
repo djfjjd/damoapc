@@ -1,0 +1,20 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "flowmoa-video-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:3000,https://damoapc3.pages.dev",
+    "VIDEO_PROVIDER": "google-veo",
+    "GOOGLE_VIDEO_MODEL": "veo-3.1-fast-generate-preview",
+    "PUBLIC_API_URL": "https://flowmoa-video-api.REPLACE.workers.dev",
+    "GOOGLE_ANALYSIS_MODEL": "gemini-2.5-flash"
+  },
+  "d1_databases": [{ "binding": "DB", "database_name": "flowmoa", "database_id": "REPLACE_WITH_D1_DATABASE_ID", "migrations_dir": "migrations" }],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "flowmoa-media" }],
+  "queues": {
+    "producers": [{ "binding": "JOBS", "queue": "flowmoa-video-jobs" }],
+    "consumers": [{ "queue": "flowmoa-video-jobs", "max_batch_size": 1, "max_retries": 5, "dead_letter_queue": "flowmoa-video-jobs-dlq" }]
+  }
+}
