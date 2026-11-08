@@ -84,11 +84,12 @@ async function router(request: Request, env: Env): Promise<Response> {
   }
 
   if (path === "/api/video/jobs" && request.method === "POST") {
-    const form = await request.formData(); const id = crypto.randomUUID(); const stamp = now(); const image = form.get("image"); let inputKey: string | null = null;
-    if (image instanceof File && image.size) { if (image.size > 10_000_000) return json({ error: "시작 이미지는 10MB 이하여야 합니다." }, 413, headers); inputKey = `jobs/${id}/input/${image.name}`; await env.MEDIA.put(inputKey, image.stream(), { httpMetadata: { contentType: image.type } }); }
+    const form = await request.formData(); const id = crypto.randomUUID(); const stamp = now(); const images = form.getAll("images").filter((item):item is File=>item instanceof File&&item.size>0); const inputKeys:string[]=[];
+    if(images.length>4)return json({error:"참고 이미지는 최대 4장까지 업로드할 수 있습니다."},413,headers);
+    for(const [index,image] of images.entries()){if(image.size>10_000_000)return json({error:`${image.name}: 이미지는 장당 10MB 이하여야 합니다.`},413,headers);if(!/^image\/(jpeg|png|webp)$/.test(image.type))return json({error:`${image.name}: 지원하지 않는 이미지 형식입니다.`},415,headers);const key=`jobs/${id}/input/${index}-${image.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;await env.MEDIA.put(key,image.stream(),{httpMetadata:{contentType:image.type}});inputKeys.push(key);}
     const prompt = String(form.get("prompt") || "").trim(); if (!prompt) return json({ error: "영상 설명을 입력해 주세요." }, 400, headers);
     await env.DB.prepare("INSERT INTO video_jobs (id,kind,status,progress,prompt,input_mode,model,duration,resolution,aspect_ratio,input_key,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
-      .bind(id,"generate","queued",3,prompt,String(form.get("inputMode") || "text"),String(form.get("model") || "veo-3.1-fast"),Number(form.get("duration") || 8),String(form.get("resolution") || "720p"),String(form.get("aspectRatio") || "9:16"),inputKey,stamp,stamp).run();
+      .bind(id,"generate","queued",3,prompt,String(form.get("inputMode") || "text"),String(form.get("model") || "veo-3.1-fast"),Number(form.get("duration") || 8),String(form.get("resolution") || "720p"),String(form.get("aspectRatio") || "9:16"),inputKeys.length?JSON.stringify(inputKeys):null,stamp,stamp).run();
     await env.JOBS.send({ id, action: "start-generation" }); return json(publicJob((await getJob(env,id))!), 202, headers);
   }
   if (path === "/api/render/jobs" && request.method === "POST") {
@@ -109,7 +110,7 @@ async function router(request: Request, env: Env): Promise<Response> {
 async function update(env:Env,id:string,status:string,progress:number,extra="",values:unknown[]=[]){await env.DB.prepare(`UPDATE video_jobs SET status=?,progress=?,updated_at=?${extra} WHERE id=?`).bind(status,progress,now(),...values,id).run();}
 async function callGoogle(env:Env,row:Record<string,unknown>){
   if(!env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY Secret이 설정되지 않았습니다.");
-  const instance:Record<string,unknown>={prompt:row.prompt}; if(row.input_key){const object=await env.MEDIA.get(String(row.input_key));if(object){const bytes=new Uint8Array(await object.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));instance.image={bytesBase64Encoded:btoa(binary),mimeType:object.httpMetadata?.contentType||"image/jpeg"};}}
+  const instance:Record<string,unknown>={prompt:row.prompt}; if(row.input_key){let keys:string[];try{const parsed=JSON.parse(String(row.input_key));keys=Array.isArray(parsed)?parsed:[String(row.input_key)];}catch{keys=[String(row.input_key)];}const encoded:Array<{bytesBase64Encoded:string;mimeType:string}>=[];for(const key of keys){const object=await env.MEDIA.get(key);if(object){const bytes=new Uint8Array(await object.arrayBuffer());let binary="";for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));encoded.push({bytesBase64Encoded:btoa(binary),mimeType:object.httpMetadata?.contentType||"image/jpeg"});}}if(encoded[0])instance.image=encoded[0];if(encoded.length>1)instance.referenceImages=encoded.slice(1).map(image=>({image,referenceType:"asset"}));}
   const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${env.GOOGLE_VIDEO_MODEL}:predictLongRunning`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":env.GEMINI_API_KEY},body:JSON.stringify({instances:[instance],parameters:{aspectRatio:row.aspect_ratio,resolution:row.resolution,durationSeconds:row.duration,sampleCount:1}})});
   const data=await response.json<Record<string,unknown>>();if(!response.ok)throw new Error(JSON.stringify(data));return String(data.name||"");
 }
